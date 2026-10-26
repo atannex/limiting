@@ -1,0 +1,76 @@
+{
+    "name": "atannex/limiting",
+    "description": "Rate limiting for Laravel, built for security: seven atomic algorithms (sliding window, sliding log, fixed window, token bucket, leaky bucket, GCRA, calendar quotas) plus concurrency limits, on Redis, any cache store or memory. Named policies with several limits each, failure-only counting for logins, escalating jail bans, allow and deny lists with CIDR ranges, IPv6 subnet grouping, HMAC-hashed keys, fail-open or fail-closed stores, shadow mode, IETF RateLimit headers, queue job and HTTP client limits, route attributes, Artisan tooling and test fakes.",
+    "keywords": [
+        "laravel",
+        "rate-limiting",
+        "rate-limiter",
+        "throttle",
+        "security",
+        "brute-force",
+        "gcra",
+        "token-bucket",
+        "sliding-window",
+        "redis"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Atanga Leke Collins",
+            "email": "atangageihlekecollins@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/cache": "^11.0|^12.0",
+        "illuminate/console": "^11.0|^12.0",
+        "illuminate/contracts": "^11.0|^12.0",
+        "illuminate/events": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0",
+        "illuminate/routing": "^11.0|^12.0",
+        "illuminate/support": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "atannex/routing": "^1.1",
+        "guzzlehttp/guzzle": "^7.8",
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^11.5"
+    },
+    "suggest": {
+        "ext-redis": "For the redis store through phpredis (predis/predis works too).",
+        "atannex/routing": "For the #[RateLimit] route attribute (^1.1).",
+        "guzzlehttp/guzzle": "For Limiting::guzzle(), limiting outgoing HTTP calls (^7.8)."
+    },
+    "autoload": {
+        "psr-4": {
+            "Atannex\\Limiting\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Atannex\\Limiting\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Atannex\\Limiting\\LimitingServiceProvider"
+            ],
+            "aliases": {
+                "Limiting": "Atannex\\Limiting\\Facades\\Limiting"
+            }
+        },
+        "branch-alias": {
+            "dev-main": "1.x-dev"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
