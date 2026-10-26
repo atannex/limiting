@@ -3,6 +3,7 @@
 ## v1.0.0 (2026-10-26)
 
 - Eight atomic algorithms on every store: sliding window (default), sliding log, fixed window, token bucket, leaky bucket (shaping), GCRA, calendar quotas and concurrency; costs and refunds everywhere.
+- Time never runs backwards against stored state: a request that read the clock before waiting for the store cannot reset a window or refill a bucket twice.
 - Stores: Redis (Lua compare-and-set), any Laravel cache store (per-key lock) and memory; fail open or fail closed per limit.
 - Named policies in `config/limiting.php` with several limits each; a refused request is refunded everywhere it was counted.
 - Brute-force protection: `count: failures`, cooldowns, an escalating jail across every policy and route, allow and deny lists with CIDR ranges.

@@ -18,6 +18,7 @@ final class Quota implements Algorithm
 
     public function attempt(?array $state, Limit $limit, float $now, int $cost): Transition
     {
+        $now = $this->monotonic($state, $now);
         [$start, $end] = $this->period($limit, $now);
         $count = $state !== null && (int) $state['s'] === $start ? (int) $state['c'] : 0;
         $reset = $end - $now;
@@ -33,6 +34,7 @@ final class Quota implements Algorithm
 
     public function refund(?array $state, Limit $limit, float $now, int $cost, ?string $lease = null): ?Transition
     {
+        $now = $this->monotonic($state, $now);
         [$start, $end] = $this->period($limit, $now);
 
         if ($state === null || (int) $state['s'] !== $start) {
@@ -45,6 +47,12 @@ final class Quota implements Algorithm
     }
 
     /** @return array{0: int, 1: int} */
+    /** A stale clock reading never moves the state back to an earlier period. */
+    private function monotonic(?array $state, float $now): float
+    {
+        return $state === null ? $now : max($now, (float) $state['s']);
+    }
+
     public function period(Limit $limit, float $now): array
     {
         $at = CarbonImmutable::createFromTimestamp((int) floor($now), $limit->timezone ?? $this->timezone);

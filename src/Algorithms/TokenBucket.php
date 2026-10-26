@@ -16,6 +16,8 @@ final class TokenBucket implements Algorithm
 {
     public function attempt(?array $state, Limit $limit, float $now, int $cost): Transition
     {
+        // A stale clock reading must not rewind the refill time and refill twice.
+        $now = $state === null ? $now : max($now, (float) $state['ts']);
         $capacity = (float) ($limit->burst ?? $limit->max);
         $rate = $limit->max / $limit->window;
         $tokens = $this->tokens($state, $capacity, $rate, $now);
@@ -35,6 +37,7 @@ final class TokenBucket implements Algorithm
 
     public function refund(?array $state, Limit $limit, float $now, int $cost, ?string $lease = null): ?Transition
     {
+        $now = $state === null ? $now : max($now, (float) $state['ts']);
         $capacity = (float) ($limit->burst ?? $limit->max);
         $rate = $limit->max / $limit->window;
         $tokens = min($capacity, $this->tokens($state, $capacity, $rate, $now) + $cost);

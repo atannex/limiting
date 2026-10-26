@@ -16,6 +16,7 @@ final class FixedWindow implements Algorithm
 {
     public function attempt(?array $state, Limit $limit, float $now, int $cost): Transition
     {
+        $now = $this->monotonic($state, $now);
         [$start, $end] = $this->window($limit, $now);
         $count = $this->count($state, $start);
         $reset = $end - $now;
@@ -31,6 +32,7 @@ final class FixedWindow implements Algorithm
 
     public function refund(?array $state, Limit $limit, float $now, int $cost, ?string $lease = null): ?Transition
     {
+        $now = $this->monotonic($state, $now);
         [$start, $end] = $this->window($limit, $now);
         $count = max(0, $this->count($state, $start) - $cost);
 
@@ -43,6 +45,12 @@ final class FixedWindow implements Algorithm
         $start = floor($now / $limit->window) * $limit->window;
 
         return [$start, $start + $limit->window];
+    }
+
+    /** A stale clock reading never moves the state back to an earlier window. */
+    private function monotonic(?array $state, float $now): float
+    {
+        return $state === null ? $now : max($now, (float) $state['s']);
     }
 
     private function count(?array $state, float $start): int

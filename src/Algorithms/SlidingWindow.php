@@ -21,6 +21,7 @@ final class SlidingWindow implements Algorithm
 {
     public function attempt(?array $state, Limit $limit, float $now, int $cost): Transition
     {
+        $now = $this->monotonic($state, $now);
         $w = $limit->window;
         $n = $limit->max;
         [$start, $current, $previous, $last, $previousLast] = $this->roll($state, $w, $now);
@@ -47,6 +48,7 @@ final class SlidingWindow implements Algorithm
 
     public function refund(?array $state, Limit $limit, float $now, int $cost, ?string $lease = null): ?Transition
     {
+        $now = $this->monotonic($state, $now);
         [$start, $current, $previous, $last, $previousLast] = $this->roll($state, $limit->window, $now);
         $current = max(0, $current - $cost);
 
@@ -55,6 +57,16 @@ final class SlidingWindow implements Algorithm
             ['s' => $start, 'c' => $current, 'p' => $previous, 'l' => $last, 'pl' => $previousLast],
             $start + 2 * $limit->window - $now + 1,
         );
+    }
+
+    /**
+     * A caller that read the clock before waiting for the store can arrive
+     * after a newer hit. Rolling the state back a window would lose its count,
+     * so time never runs backwards against the state.
+     */
+    private function monotonic(?array $state, float $now): float
+    {
+        return $state === null ? $now : max($now, (float) ($state['l'] ?? $state['s']));
     }
 
     /** @return array{0: float, 1: int, 2: int, 3: ?float, 4: ?float} start, current, previous, last hit, previous window's last hit */

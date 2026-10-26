@@ -228,6 +228,30 @@ final class AlgorithmsTest extends TestCase
         $this->assertEqualsWithDelta(0.1, $outcomes[6]->retryAfter, 1e-6);
     }
 
+    /** A request that read the clock before waiting for the store lock reaches the state after newer hits. */
+    #[DataProvider('counting')]
+    public function test_a_stale_clock_reading_never_rolls_the_state_back(Algorithm $algorithm): void
+    {
+        $limit = Limit::perMinute(3);
+        $state = null;
+        $boundary = self::T0 + 20; // the next minute starts
+
+        $this->assertSame(3, $this->allowed($this->run_($algorithm, $limit, $boundary + 0.5, 3, $state)));
+        $this->assertSame(0, $this->allowed($this->run_($algorithm, $limit, $boundary - 0.01, 1, $state)));
+        $this->assertSame(0, $this->allowed($this->run_($algorithm, $limit, $boundary + 0.5, 1, $state)));
+    }
+
+    public function test_a_stale_clock_reading_never_rolls_a_quota_back(): void
+    {
+        $algorithm = new Quota;
+        $limit = Limit::monthly(2);
+        $state = null;
+        $april = (float) gmmktime(0, 0, 0, 4, 1, 2026);
+
+        $this->assertSame(2, $this->allowed($this->run_($algorithm, $limit, $april + 1, 2, $state)));
+        $this->assertSame(0, $this->allowed($this->run_($algorithm, $limit, $april - 0.5, 1, $state)));
+    }
+
     public function test_quota_resets_at_the_calendar_boundary_in_its_time_zone(): void
     {
         $algorithm = new Quota;
