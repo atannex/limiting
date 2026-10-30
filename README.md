@@ -7,11 +7,3 @@ Rate limiting for Laravel, built to protect a site. It controls how often someon
 ```bash
 composer require atannex/limiting
 ```
-
-## Documentation
-
-The full guide is in [docs/README.md](docs/README.md).
-
-## License
-
-MIT.
