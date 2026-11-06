@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0 (unreleased)
+
+- Laravel 13 support (illuminate/* ^13.0, Testbench 11); CI covers PHP 8.2–8.5 and Laravel 11–13.
+
 ## v1.0.0 (2026-10-26)
 
 - Eight atomic algorithms on every store: sliding window (default), sliding log, fixed window, token bucket, leaky bucket (shaping), GCRA, calendar quotas and concurrency; costs and refunds everywhere.

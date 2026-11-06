@@ -204,6 +204,8 @@ final class StoresTest extends TestCase
             public function flush() {}
 
             public function getPrefix() {}
+
+            public function touch($key, $seconds) {}
         }));
     }
 }
